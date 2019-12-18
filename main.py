@@ -8,23 +8,14 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-import time
 import sys
 import PIL
+import os
 from PySide2 import QtCore, QtGui, QtWidgets
 from mss import mss
 from PIL import Image
 from PIL import ImageGrab
 from PIL import ImageFilter
-
-
-
-# TODO : Set a path for the screenshots (hardcoded or user given?)
-# TODO : Add a blur slider for the value + blur functionality
-# TODO : Resize screen based on window would be nice
-# TODO : Add About info
-
-
 
 # About
 
@@ -33,8 +24,9 @@ Contact = "ioan.andrei.nistor@gmail.com"
 StyleSheetFile = "darkOrange.css"
 
 class Ui_MainWindow(object):
+
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("CompositionTool")
+        MainWindow.setObjectName("Composition Helper")
         MainWindow.resize(1280, 805)
         MainWindow.setAcceptDrops(False)
         MainWindow.setWindowOpacity(1.0)
@@ -44,10 +36,10 @@ class Ui_MainWindow(object):
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
 
         self.ActivePhoto = ""
-        self.firstScreen = "D:\\PublicRepo\\Screenshot1.png"
-        self.secondScreen = "D:\\PublicRepo\\Screenshot2.png"
+        self.firstScreen = "D:\\CompositionHelper\\Screenshot1.png"
+        self.secondScreen = "D:\\CompositionHelper\\Screenshot2.png"
 
-        self.themelocation = "D:\\PublicRepo\\darktheme.css"
+        self.themelocation = "D:\\CompositionHelper\\darktheme.css"
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
 
@@ -151,12 +143,13 @@ class Ui_MainWindow(object):
         self.blurButton.setVisible(False)
         self.display1Button.setVisible(False)
         self.display2Button.setVisible(False)
+        self.createFolder()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "Composition Tool", None, -1))
+        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "Composition Helper", None, -1))
 
         self.mirrorButton.setToolTip(QtWidgets.QApplication.translate("MainWindow", "Mirror the image vertically", None, -1))
         self.mirrorButton.setText(QtWidgets.QApplication.translate("MainWindow", "Mirror", None, -1))
@@ -179,6 +172,16 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(QtWidgets.QApplication.translate("MainWindow", "About", None, -1))
 
 
+    def createFolder(self):
+
+        """
+        Create new folder to put in the screenshots if it does not exist
+        """
+
+        self.directory = "D:\\CompositionHelper"
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+            print ('Created new folder')
 
     def grabScreenshot(self):
 
@@ -201,7 +204,7 @@ class Ui_MainWindow(object):
             sct_img = sct.grab(monitor)
             # Convert to PIL/Pillow Image
             screenshots = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
-            screenshots.save("Screenshot1.png", "PNG")
+            screenshots.save(self.firstScreen, "PNG")
 
             # 2nd Display Screen shot
 
@@ -209,7 +212,7 @@ class Ui_MainWindow(object):
             sct_img = sct.grab(monitor)
             # Convert to PIL/Pillow Image
             screenshots = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
-            screenshots.save("Screenshot2.png", "PNG")
+            screenshots.save(self.secondScreen, "PNG")
         self.photo.setPixmap(QtGui.QPixmap(self.firstScreen))
         self.statustext.setText("Added display 1 as work display for now")
         self.ActivePhoto = "Screenshot1.png" # Set Photo as display 1 so we dont get callstack error when mirrroring
